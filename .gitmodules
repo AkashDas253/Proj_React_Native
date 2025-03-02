@@ -1,0 +1,3 @@
+[submodule "CalculatorApp"]
+	path = CalculatorApp
+	url = ./CalculatorApp
