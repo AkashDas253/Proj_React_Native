@@ -1,8 +1,11 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
-import React, { useState } from 'react';
-
-// Quotes will be fetched from API
+import React, { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { View, Text, TouchableOpacity } from 'react-native';
+import QuoteCard from './components/QuoteCard';
+import SettingsScreen from './components/SettingsScreen';
+import StorageScreen from './components/StorageScreen';
 
 const themes = {
   light: {
@@ -19,25 +22,28 @@ const themes = {
   }
 };
 
-export default function App() {
-  const [theme, setTheme] = useState('light');
+const bgShades = {
+  default: '#fff',
+  blue: '#e3f2fd',
+  green: '#e8f5e9',
+  yellow: '#fffde7',
+};
+
+function HomeScreen({ navigation, theme, setTheme, bgShade, setBgShade, savedQuotes, setSavedQuotes }) {
   const [quotes, setQuotes] = useState([]);
   const [quoteIdx, setQuoteIdx] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  React.useEffect(() => {
-    // Fetch 50 random quotes from ZenQuotes API, fallback to local quotes if failed
+  useEffect(() => {
     fetch('https://zenquotes.io/api/quotes')
       .then((response) => response.json())
       .then((data) => {
-        // ZenQuotes returns [{q: quote, a: author, h: html}, ...]
         const formattedQuotes = data.map(q => ({ text: q.q, author: q.a }));
         setQuotes(formattedQuotes);
         setLoading(false);
       })
       .catch((err) => {
-        // Fallback quotes
         setQuotes([
           { text: "The best way to get started is to quit talking and begin doing.", author: "Walt Disney" },
           { text: "Don't let yesterday take up too much of today.", author: "Will Rogers" },
@@ -50,14 +56,6 @@ export default function App() {
       });
   }, []);
 
-  const handleThemeToggle = () => {
-    setTheme(theme === 'light' ? 'dark' : 'light');
-  };
-
-  const handleNextQuote = () => {
-    setQuoteIdx((quoteIdx + 1) % quotes.length);
-  };
-
   const currentTheme = themes[theme];
 
   let quoteText = '';
@@ -67,58 +65,133 @@ export default function App() {
     quoteAuthor = quotes[quoteIdx]?.author || 'Unknown';
   }
 
+  const handleNextQuote = () => {
+    setQuoteIdx((quoteIdx + 1) % quotes.length);
+  };
+
+  const handleSaveQuote = async () => {
+    try {
+      const existing = await AsyncStorage.getItem('savedQuotes');
+      let arr = existing ? JSON.parse(existing) : [];
+      arr.push({ text: quoteText, author: quoteAuthor });
+      await AsyncStorage.setItem('savedQuotes', JSON.stringify(arr));
+      setSavedQuotes(arr);
+      alert('Quote saved to device.');
+    } catch (e) {
+      alert('Failed to save quote.');
+    }
+  };
+
   return (
-    <View style={[styles.container, { backgroundColor: currentTheme.backgroundColor }]}> 
+    <View style={{ flex: 1, backgroundColor: bgShades[bgShade], justifyContent: 'center', alignItems: 'center', padding: 20 }}>
+      <Text style={{ fontSize: 32, fontWeight: 'bold', marginBottom: 20 }}>Themed Quote App</Text>
       {loading ? (
-        <Text style={[styles.quote, { color: currentTheme.textColor }]}>Loading...</Text>
+        <QuoteCard quote="Loading..." author="" />
       ) : error ? (
-        <Text style={[styles.quote, { color: 'red' }]}>{error}</Text>
+        <QuoteCard quote={error} author="" />
       ) : (
-        <>
-          <Text style={[styles.quote, { color: currentTheme.textColor }]}>
-            {quoteText}
-          </Text>
-          <Text style={{ color: currentTheme.textColor, marginBottom: 20 }}>
-            — {quoteAuthor}
-          </Text>
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: currentTheme.buttonColor }]}
-            onPress={handleNextQuote}
-          >
-            <Text style={{ color: currentTheme.buttonText }}>Next Quote</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.button, { backgroundColor: currentTheme.buttonColor, marginTop: 10 }]}
-            onPress={handleThemeToggle}
-          >
-            <Text style={{ color: currentTheme.buttonText }}>
-              Switch to {theme === 'light' ? 'Dark' : 'Light'} Theme
-            </Text>
-          </TouchableOpacity>
-        </>
+        <QuoteCard quote={quoteText} author={quoteAuthor} onSave={handleSaveQuote} theme={theme} backgroundColor={bgShades[bgShade]} />
       )}
-      <StatusBar style={theme === 'light' ? 'dark' : 'light'} />
+      <TouchableOpacity
+        style={{ marginTop: 10, backgroundColor: currentTheme.buttonColor, padding: 12, borderRadius: 8 }}
+        onPress={handleNextQuote}
+      >
+        <Text style={{ color: currentTheme.buttonText }}>Next Quote</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={{ marginTop: 10, backgroundColor: currentTheme.buttonColor, padding: 12, borderRadius: 8 }}
+        onPress={() => navigation.navigate('Settings')}
+      >
+        <Text style={{ color: currentTheme.buttonText }}>Settings</Text>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={{ marginTop: 10, backgroundColor: currentTheme.buttonColor, padding: 12, borderRadius: 8 }}
+        onPress={() => navigation.navigate('Storage')}
+      >
+        <Text style={{ color: currentTheme.buttonText }}>Saved Quotes</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  quote: {
-    fontSize: 22,
-    textAlign: 'center',
-    marginBottom: 30,
-    fontStyle: 'italic',
-  },
-  button: {
-    paddingVertical: 12,
-    paddingHorizontal: 24,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-});
+const Stack = createStackNavigator();
+
+export default function App() {
+  const [theme, setTheme] = useState('light');
+  const [bgShade, setBgShade] = useState('default');
+  const [savedQuotes, setSavedQuotes] = useState([]);
+
+  useEffect(() => {
+    const fetchQuotes = async () => {
+      try {
+        const quotes = await AsyncStorage.getItem('savedQuotes');
+        setSavedQuotes(quotes ? JSON.parse(quotes) : []);
+      } catch (e) {
+        setSavedQuotes([]);
+      }
+    };
+    fetchQuotes();
+  }, []);
+
+  const handleSaveSettings = async () => {
+    try {
+      await AsyncStorage.setItem('theme', theme);
+      await AsyncStorage.setItem('bgShade', bgShade);
+      alert('Settings saved!');
+    } catch (e) {
+      alert('Failed to save settings.');
+    }
+  };
+
+  const handleDeleteQuote = async (index) => {
+    try {
+      const updated = [...savedQuotes];
+      updated.splice(index, 1);
+      await AsyncStorage.setItem('savedQuotes', JSON.stringify(updated));
+      setSavedQuotes(updated);
+    } catch (e) {
+      alert('Failed to delete quote.');
+    }
+  };
+
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Home">
+        <Stack.Screen name="Home">
+          {props => (
+            <HomeScreen
+              {...props}
+              theme={theme}
+              setTheme={setTheme}
+              bgShade={bgShade}
+              setBgShade={setBgShade}
+              savedQuotes={savedQuotes}
+              setSavedQuotes={setSavedQuotes}
+            />
+          )}
+        </Stack.Screen>
+        <Stack.Screen name="Settings">
+          {props => (
+            <SettingsScreen
+              {...props}
+              theme={theme}
+              setTheme={setTheme}
+              bgShade={bgShade}
+              setBgShade={setBgShade}
+              onSaveSettings={handleSaveSettings}
+            />
+          )}
+        </Stack.Screen>
+        <Stack.Screen name="Storage">
+          {props => (
+            <StorageScreen
+              {...props}
+              savedQuotes={savedQuotes}
+              onDeleteQuote={handleDeleteQuote}
+            />
+          )}
+        </Stack.Screen>
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
