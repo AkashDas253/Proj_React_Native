@@ -8,18 +8,18 @@ const colorOptions = [
   { key: 'yellow', label: 'Yellow', color: '#fffde7' },
 ];
 
-export default function SettingsScreen({ theme, setTheme, bgShade, setBgShade, navigation, onSaveSettings }) {
+export default function SettingsScreen({ theme, setTheme, bgShade, setBgShade, onSaveSettings }) {
   return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20 }}>
-      <Text style={{ fontSize: 32, fontWeight: 'bold', marginBottom: 30 }}>App Settings</Text>
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', padding: 20, backgroundColor: bgShade === 'default' ? '#fff' : colorOptions.find(opt => opt.key === bgShade)?.color }}>
+      <Text style={{ fontSize: 32, fontWeight: 'bold', marginBottom: 30, color: theme === 'dark' ? '#fff' : '#222' }}>App Settings</Text>
       <View style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 20 }}>
-        <Text style={{ fontSize: 18, marginRight: 10 }}>Dark Theme</Text>
+        <Text style={{ fontSize: 18, marginRight: 10, color: theme === 'dark' ? '#fff' : '#222' }}>Dark Theme</Text>
         <Switch
           value={theme === 'dark'}
           onValueChange={val => setTheme(val ? 'dark' : 'light')}
         />
       </View>
-      <Text style={{ fontSize: 18, marginTop: 20, marginBottom: 10 }}>Background Color</Text>
+      <Text style={{ fontSize: 18, marginTop: 20, marginBottom: 10, color: theme === 'dark' ? '#fff' : '#222' }}>Background Color</Text>
       <View style={{ flexDirection: 'row', marginTop: 10, marginBottom: 20 }}>
         {colorOptions.map(opt => (
           <TouchableOpacity
@@ -42,9 +42,6 @@ export default function SettingsScreen({ theme, setTheme, bgShade, setBgShade, n
         onPress={onSaveSettings}
       >
         <Text style={{ color: '#fff', fontWeight: 'bold' }}>Save Settings</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={{ backgroundColor: '#2196F3', padding: 12, borderRadius: 8 }} onPress={() => navigation.goBack()}>
-        <Text style={{ color: '#fff', fontWeight: 'bold' }}>Go Back</Text>
       </TouchableOpacity>
     </View>
   );
