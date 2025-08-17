@@ -157,7 +157,33 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home">
-        <Stack.Screen name="Home">
+        <Stack.Screen
+          name="Home"
+          options={({ navigation }) => ({
+            headerTitle: () => (
+              <Text style={{ fontSize: 22, fontWeight: 'bold', color: themes[theme].textColor }}>Themed Quote App</Text>
+            ),
+            headerRight: () => (
+              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('Storage')}
+                  style={{ marginRight: 16 }}
+                  accessibilityLabel="Saved Quotes"
+                >
+                  <Text style={{ fontSize: 24 }}>💾</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => navigation.navigate('Settings')}
+                  style={{ marginRight: 16 }}
+                  accessibilityLabel="Settings"
+                >
+                  <Text style={{ fontSize: 24 }}>⚙️</Text>
+                </TouchableOpacity>
+              </View>
+            ),
+            headerStyle: { backgroundColor: themes[theme].backgroundColor },
+          })}
+        >
           {props => (
             <HomeScreen
               {...props}
