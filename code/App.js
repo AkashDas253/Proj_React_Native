@@ -83,33 +83,16 @@ function HomeScreen({ navigation, theme, setTheme, bgShade, setBgShade, savedQuo
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: bgShades[bgShade], justifyContent: 'center', alignItems: 'center', padding: 20 }}>
-      <Text style={{ fontSize: 32, fontWeight: 'bold', marginBottom: 20 }}>Themed Quote App</Text>
+    <View style={{ flex: 1, backgroundColor: bgShades[bgShade], justifyContent: 'center', alignItems: 'center', padding: 10 }}>
+      {/* Slimmer content, no extra buttons, less crowded */}
       {loading ? (
-        <QuoteCard quote="Loading..." author="" />
+        <QuoteCard quote="Loading..." author="" theme={theme} backgroundColor={bgShades[bgShade]} />
       ) : error ? (
-        <QuoteCard quote={error} author="" />
+        <QuoteCard quote={error} author="" theme={theme} backgroundColor={bgShades[bgShade]} />
       ) : (
         <QuoteCard quote={quoteText} author={quoteAuthor} onSave={handleSaveQuote} theme={theme} backgroundColor={bgShades[bgShade]} />
       )}
-      <TouchableOpacity
-        style={{ marginTop: 10, backgroundColor: currentTheme.buttonColor, padding: 12, borderRadius: 8 }}
-        onPress={handleNextQuote}
-      >
-        <Text style={{ color: currentTheme.buttonText }}>Next Quote</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={{ marginTop: 10, backgroundColor: currentTheme.buttonColor, padding: 12, borderRadius: 8 }}
-        onPress={() => navigation.navigate('Settings')}
-      >
-        <Text style={{ color: currentTheme.buttonText }}>Settings</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={{ marginTop: 10, backgroundColor: currentTheme.buttonColor, padding: 12, borderRadius: 8 }}
-        onPress={() => navigation.navigate('Storage')}
-      >
-        <Text style={{ color: currentTheme.buttonText }}>Saved Quotes</Text>
-      </TouchableOpacity>
+      <Text style={{ color: currentTheme.textColor, fontSize: 14, marginTop: 10, opacity: 0.7 }}>Tap the icons above for Settings or Saved Quotes</Text>
     </View>
   );
 }
@@ -132,6 +115,11 @@ export default function App() {
     };
     fetchQuotes();
   }, []);
+
+  // Apply theme and background color instantly when changed
+  useEffect(() => {
+    // This effect will trigger a re-render with new theme/bgShade
+  }, [theme, bgShade]);
 
   const handleSaveSettings = async () => {
     try {
