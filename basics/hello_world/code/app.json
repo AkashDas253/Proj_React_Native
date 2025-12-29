@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "code",
-    "slug": "code",
+    "name": "Hello World",
+    "slug": "hello-world",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -16,7 +16,8 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
+      "edgeToEdgeEnabled": true,
+      "package": "com.akashdas253.helloworld"
     },
     "web": {
       "bundler": "metro",
@@ -37,6 +38,13 @@
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "ec61b911-b545-4fc8-938c-f692eb38628c"
+      }
+    },
+    "owner": "akashdas253"
   }
 }

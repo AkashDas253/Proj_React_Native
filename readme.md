@@ -1,3 +1,13 @@
+# Practice React Native
+
+## Basics
+- [Hello World](./basics/hello_world/readme.md)
+
+
+<!-- ##
+
+
+
 ## **React Native Mini-Projects by Concept**
 
 | #      | Mini-Project                  | Main Topic                     | Tech & Libraries                             | Key Specs                                                                                                         |
@@ -18,4 +28,4 @@
 | **14** | **Deep Link Navigator**       | **Deep Linking**               | React Navigation, Linking API                | - Handle `myapp://profile/123` URLs<br>- Open specific screen from notification<br>- Test with Expo & real device |
 | **15** | **E2E Test Playground**       | **Testing**                    | Detox                                        | - Simple app with login & dashboard<br>- Write automated tests<br>- Validate UI & navigation flow                 |
 
----
+--- -->
