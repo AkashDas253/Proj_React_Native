@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "TaskTaker",
-    "slug": "TaskTaker",
+    "name": "Task Taker",
+    "slug": "tasktaker",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -19,10 +19,20 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.akashdas253.tasktaker"
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-font",
+      "expo-asset"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "e2c90376-35b7-4a9b-819c-d27bb140491d"
+      }
     }
   }
 }

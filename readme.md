@@ -3,7 +3,9 @@
 ## Basics
 - [Hello World](./basics/hello_world/readme.md)
 
-
+## Projects
+- [Calculator](./projects/Calculator/readme.md)
+- [Task Taker](./projects/TaskTaker/readme.md)
 <!-- ##
 
 
