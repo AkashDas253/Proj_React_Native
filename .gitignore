@@ -1,1 +1,41 @@
+# VSCode
 .vscode/
+
+# Dependencies
+node_modules/
+
+# Expo / EAS
+.expo/
+dist/
+web-build/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+
+# Native Directories 
+ios/
+android/
+
+# Environment Secrets
+.env
+.env*.local
+
+# Build Artifacts
+*.apk
+*.aab
+*.ipa
+
+# Metro / Debug
+.metro-health-check*
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# System / IDE
+.DS_Store
+.idea/
+.vscode/
+*.tsbuildinfo
