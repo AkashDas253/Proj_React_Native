@@ -16,8 +16,7 @@ SplashScreen.preventAutoHideAsync();
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowBanner: true, 
-    shouldShowList: true,   
+    shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
   }),
@@ -40,6 +39,8 @@ export default function App() {
     async function prepare() {
       try {
         if (fontsLoaded || fontError) {
+          if (fontError) console.error("Font loading error:", fontError);
+          
           await new Promise(resolve => setTimeout(resolve, 500));
           setAppIsReady(true);
         }
@@ -85,7 +86,9 @@ export default function App() {
     return true;
   });
 
-  if (!appIsReady) return null;
+  if (!appIsReady) {
+    return null;
+  }
 
   return (
     <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
