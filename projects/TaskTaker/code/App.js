@@ -1,86 +1,46 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState } from 'react';
 import { 
-  StyleSheet, Text, View, Alert, SafeAreaView, 
+  StyleSheet, Text, View, SafeAreaView, 
   KeyboardAvoidingView, Platform, TouchableOpacity 
 } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Notifications from 'expo-notifications';
 import TaskInput from './components/TaskInput';
 import TaskList from './components/TaskList';
+import { useTaskManager } from './hooks/useTaskManager';
+
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: false,
+  }),
+});
 
 export default function App() {
+  const { tasks, addTask, updateTask, toggleComplete, removeTask } = useTaskManager();
+  
   const [task, setTask] = useState('');
-  const [tasks, setTasks] = useState([]);
   const [isEditing, setIsEditing] = useState(false);
   const [currentTaskKey, setCurrentTaskKey] = useState(null);
   const [filter, setFilter] = useState('All');
-  const isLoaded = useRef(false);
 
-  useEffect(() => {
-    loadTasks();
-  }, []);
-
-  useEffect(() => {
-    if (isLoaded.current) {
-      saveTasks();
-    }
-  }, [tasks]);
-
-  const saveTasks = async () => {
-    try {
-      await AsyncStorage.setItem('tasks_v2', JSON.stringify(tasks));
-    } catch (error) {
-      Alert.alert('Error', 'Failed to save tasks');
-    }
-  };
-
-  const loadTasks = async () => {
-    try {
-      const savedTasks = await AsyncStorage.getItem('tasks_v2');
-      if (savedTasks) {
-        setTasks(JSON.parse(savedTasks));
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Failed to load tasks');
-    } finally {
-      isLoaded.current = true;
-    }
-  };
-
-  const handleTaskAction = () => {
-    if (task.trim().length === 0) return;
+  const handleTaskAction = (text, date) => {
+    if (text.trim().length === 0) return;
 
     if (isEditing) {
-      setTasks(prev => prev.map(t => 
-        t.key === currentTaskKey ? { ...t, value: task } : t
-      ));
+      updateTask(currentTaskKey, text);
       setIsEditing(false);
       setCurrentTaskKey(null);
     } else {
-      const newTask = {
-        key: Date.now().toString(),
-        value: task,
-        completed: false,
-        timestamp: new Date().toLocaleDateString()
-      };
-      setTasks(prev => [newTask, ...prev]);
+      addTask(text, date);
     }
     setTask('');
-  };
-
-  const toggleComplete = (key) => {
-    setTasks(prev => prev.map(t => 
-      t.key === key ? { ...t, completed: !t.completed } : t
-    ));
   };
 
   const startEditTask = (item) => {
     setTask(item.value);
     setIsEditing(true);
     setCurrentTaskKey(item.key);
-  };
-
-  const removeTask = (taskKey) => {
-    setTasks(prev => prev.filter(t => t.key !== taskKey));
   };
 
   const filteredTasks = tasks.filter(t => {

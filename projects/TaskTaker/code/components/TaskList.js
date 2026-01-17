@@ -11,7 +11,7 @@ const TaskList = ({ tasks, removeTask, startEditTask, toggleComplete }) => {
         <TaskItem 
           item={item} 
           removeTask={removeTask} 
-          startEditTask={startEditTask}
+          startEditTask={startEditTask} 
           toggleComplete={toggleComplete}
         />
       )}
