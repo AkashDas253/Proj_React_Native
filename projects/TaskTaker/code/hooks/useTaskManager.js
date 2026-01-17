@@ -1,4 +1,4 @@
- import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Alert, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Notifications from 'expo-notifications';
@@ -6,8 +6,7 @@ import * as Device from 'expo-device';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowBanner: true, 
-    shouldShowList: true,
+    shouldShowAlert: true,
     shouldPlaySound: true,
     shouldSetBadge: false,
   }),
@@ -82,6 +81,12 @@ export const useTaskManager = () => {
     }));
   };
 
+  const updateTask = (key, newText) => {
+    setTasks(prev => prev.map(t => 
+      t.key === key ? { ...t, value: newText } : t
+    ));
+  };
+
   const toggleComplete = (key) => {
     setTasks(prev => prev.map(t => t.key === key ? { ...t, completed: !t.completed } : t));
   };
@@ -94,5 +99,5 @@ export const useTaskManager = () => {
     setTasks(prev => prev.filter(t => t.key !== key));
   };
 
-  return { tasks, addTask, toggleComplete, removeTask };
+  return { tasks, addTask, updateTask, toggleComplete, removeTask };
 };

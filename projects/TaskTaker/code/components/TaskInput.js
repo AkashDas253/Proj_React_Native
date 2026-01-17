@@ -3,7 +3,7 @@ import { View, TextInput, StyleSheet, TouchableOpacity, Text, Alert, Platform } 
 import { Feather } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 
-const TaskInput = ({ task, setTask, onPress }) => {
+const TaskInput = ({ task, setTask, onPress, isEditing, onCancel }) => {
   const [date, setDate] = useState(new Date());
   const [mode, setMode] = useState('date');
   const [show, setShow] = useState(false);
@@ -45,10 +45,9 @@ const TaskInput = ({ task, setTask, onPress }) => {
     }
   };
 
-  const handleAdd = () => {
+  const handleAction = () => {
     if (!task.trim()) return;
     onPress(task, alarmSet ? date : null);
-    setTask('');
     setAlarmSet(false);
     setDate(new Date());
   };
@@ -57,23 +56,36 @@ const TaskInput = ({ task, setTask, onPress }) => {
     <View style={styles.wrapper}>
       <View style={styles.container}>
         <TextInput 
-            style={styles.input} 
-            placeholder="What's on your mind?" 
+            style={[styles.input, isEditing && styles.editingInput]} 
+            placeholder={isEditing ? "Update task..." : "What's on your mind?"} 
             value={task} 
             onChangeText={setTask} 
         />
+        
+        {!isEditing && (
+          <TouchableOpacity 
+              style={[styles.iconBtn, alarmSet && styles.activeBtn]} 
+              onPress={() => { setMode('date'); setShow(true); }}
+          >
+            <Feather name="bell" size={20} color={alarmSet ? "#FFF" : "#666"} />
+          </TouchableOpacity>
+        )}
+
         <TouchableOpacity 
-            style={[styles.iconBtn, alarmSet && styles.activeBtn]} 
-            onPress={() => { setMode('date'); setShow(true); }}
+          style={[styles.addBtn, isEditing && styles.saveBtn]} 
+          onPress={handleAction}
         >
-          <Feather name="bell" size={20} color={alarmSet ? "#FFF" : "#666"} />
+          <Feather name={isEditing ? "check" : "plus"} size={24} color="#FFF" />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.addBtn} onPress={handleAdd}>
-          <Feather name="plus" size={24} color="#FFF" />
-        </TouchableOpacity>
+
+        {isEditing && (
+          <TouchableOpacity style={styles.cancelBtn} onPress={onCancel}>
+            <Feather name="x-circle" size={24} color="#FF5252" />
+          </TouchableOpacity>
+        )}
       </View>
 
-      {alarmSet && (
+      {alarmSet && !isEditing && (
         <View style={styles.badge}>
           <Text style={styles.badgeText}>
             🔔 {date.toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
@@ -101,12 +113,62 @@ const TaskInput = ({ task, setTask, onPress }) => {
 const styles = StyleSheet.create({
   wrapper: { marginBottom: 15 },
   container: { flexDirection: 'row', alignItems: 'center' },
-  input: { flex: 1, backgroundColor: '#FFF', borderRadius: 12, padding: 15, borderWidth: 1, borderColor: '#DDD' },
-  iconBtn: { width: 48, height: 48, backgroundColor: '#EEE', borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginHorizontal: 8 },
+  input: { 
+    flex: 1, 
+    backgroundColor: '#FFF', 
+    borderRadius: 12, 
+    padding: 15, 
+    borderWidth: 1, 
+    borderColor: '#DDD' 
+  },
+  editingInput: { 
+    borderColor: '#3498db', 
+    backgroundColor: '#F0F9FF' 
+  },
+  iconBtn: { 
+    width: 48, 
+    height: 48, 
+    backgroundColor: '#EEE', 
+    borderRadius: 12, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    marginHorizontal: 8 
+  },
   activeBtn: { backgroundColor: '#e67e22' },
-  addBtn: { width: 48, height: 48, backgroundColor: '#3498db', borderRadius: 12, justifyContent: 'center', alignItems: 'center' },
-  badge: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#FFF3E0', marginTop: 10, padding: 8, borderRadius: 8, alignSelf: 'flex-start' },
-  badgeText: { fontSize: 12, color: '#e67e22', fontWeight: 'bold', marginRight: 8 }
+  addBtn: { 
+    width: 48, 
+    height: 48, 
+    backgroundColor: '#3498db', 
+    borderRadius: 12, 
+    justifyContent: 'center', 
+    alignItems: 'center' 
+  },
+  saveBtn: { 
+    backgroundColor: '#27ae60', 
+    marginLeft: 8 
+  },
+  cancelBtn: { 
+    width: 40, 
+    height: 48, 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    marginLeft: 8 
+  },
+  badge: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    backgroundColor: '#FFF3E0', 
+    marginTop: 10, 
+    padding: 8, 
+    borderRadius: 8, 
+    alignSelf: 'flex-start' 
+  },
+  badgeText: { 
+    fontSize: 12, 
+    color: '#e67e22', 
+    fontWeight: 'bold', 
+    marginRight: 8 
+  }
 });
 
 export default TaskInput;

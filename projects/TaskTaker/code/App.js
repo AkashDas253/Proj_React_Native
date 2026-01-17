@@ -1,36 +1,66 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
   StyleSheet, Text, View, SafeAreaView, 
   KeyboardAvoidingView, Platform, TouchableOpacity 
 } from 'react-native';
 import * as Notifications from 'expo-notifications';
+import * as SplashScreen from 'expo-splash-screen';
+import { useFonts } from 'expo-font'; 
+import { Feather } from '@expo/vector-icons'; 
+
 import TaskInput from './components/TaskInput';
 import TaskList from './components/TaskList';
 import { useTaskManager } from './hooks/useTaskManager';
 
+SplashScreen.preventAutoHideAsync();
+
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
-    shouldShowAlert: true,
+    shouldShowBanner: true, 
+    shouldShowList: true,   
     shouldPlaySound: true,
     shouldSetBadge: false,
   }),
 });
 
 export default function App() {
+  const [fontsLoaded, fontError] = useFonts({
+    ...Feather.font,
+  });
+
   const { tasks, addTask, updateTask, toggleComplete, removeTask } = useTaskManager();
   
   const [task, setTask] = useState('');
   const [isEditing, setIsEditing] = useState(false);
   const [currentTaskKey, setCurrentTaskKey] = useState(null);
   const [filter, setFilter] = useState('All');
+  const [appIsReady, setAppIsReady] = useState(false);
+
+  useEffect(() => {
+    async function prepare() {
+      try {
+        if (fontsLoaded || fontError) {
+          await new Promise(resolve => setTimeout(resolve, 500));
+          setAppIsReady(true);
+        }
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+    prepare();
+  }, [fontsLoaded, fontError]);
+
+  const onLayoutRootView = useCallback(async () => {
+    if (appIsReady) {
+      await SplashScreen.hideAsync();
+    }
+  }, [appIsReady]);
 
   const handleTaskAction = (text, date) => {
     if (text.trim().length === 0) return;
-
     if (isEditing) {
       updateTask(currentTaskKey, text);
-      setIsEditing(false);
-      setCurrentTaskKey(null);
+      cancelEdit();
     } else {
       addTask(text, date);
     }
@@ -43,21 +73,31 @@ export default function App() {
     setCurrentTaskKey(item.key);
   };
 
+  const cancelEdit = () => {
+    setTask('');
+    setIsEditing(false);
+    setCurrentTaskKey(null);
+  };
+
   const filteredTasks = tasks.filter(t => {
     if (filter === 'Active') return !t.completed;
     if (filter === 'Completed') return t.completed;
     return true;
   });
 
+  if (!appIsReady) return null;
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} onLayout={onLayoutRootView}>
       <KeyboardAvoidingView 
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
         style={styles.inner}
       >
         <View style={styles.header}>
           <Text style={styles.title}>TaskTaker</Text>
-          <Text style={styles.subtitle}>{tasks.filter(t => !t.completed).length} tasks remaining</Text>
+          <Text style={styles.subtitle}>
+            {tasks.filter(t => !t.completed).length} tasks remaining
+          </Text>
         </View>
 
         <TaskInput
@@ -65,6 +105,7 @@ export default function App() {
           setTask={setTask}
           onPress={handleTaskAction}
           isEditing={isEditing}
+          onCancel={cancelEdit} 
         />
 
         <View style={styles.filterBar}>
@@ -96,6 +137,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F8F9FA',
+    paddingTop: Platform.OS === 'android' ? 30 : 0,
   },
   inner: {
     flex: 1,
