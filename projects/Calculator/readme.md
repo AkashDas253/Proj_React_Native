@@ -1,56 +1,59 @@
-# React Native Calculator
+# React Native Scientific Calculator
 
-A sleek, high-performance calculator built with React Native featuring smart logic, square root functions, and calculation history.
+High-precision mathematical evaluation engine built with React Native 0.79, React 19, and the New Architecture (Fabric).
 
-## Features
+## Core Architecture
 
-* **Square Root Function (`√`):** Supports square root logic. Automatically converts `√(` to `Math.sqrt(` for accurate mathematical evaluation.
-* **Smart Parentheses:** Intelligently toggles between `(` and `)` based on bracket count and context. It also supports implicit multiplication (e.g., `5(` becomes `5*(` or `5√` becomes `5*√(`).
-* **Input Length Guard:** Strictly limits input to **15 characters** to prevent display overflow and ensure UI stability.
-* **Interactive History:** Stores the last 10 calculations at the top of the screen. Users can tap any history record to restore that value to the input field.
-* **Smart Operator Replacement:** Prevents double operators (like `++`) by replacing the previous operator if a new one is pressed, while still allowing negative signs (e.g., `5*-2`).
-* **Haptic Feedback:** Provides physical vibration feedback when the user attempts to exceed the character limit.
-* **Auto-Formatting:** Automatically closes open brackets before calculation and removes unnecessary trailing zeros from results.
+* **Rendering Engine:** Utilizes the New Architecture (Fabric) for high-performance UI updates and synchronous layout calculations.
+* **Mathematical Logic:** Powered by `mathjs` configured with `BigNumber` at 64-bit precision to eliminate floating-point arithmetic errors.
+* **State Management:** Implemented via `zustand` with persistence middleware for session-based history storage.
+* **Orientation Logic:** Dynamic layout switching between Portrait (Standard) and Landscape (Scientific) using `expo-screen-orientation`.
 
-## Installation
+## Technical Features
 
-1.  **Clone the project:**
-    ```bash
-    git clone [https://github.com/yourusername/calculator-app.git](https://github.com/yourusername/calculator-app.git)
-    ```
-
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    ```
-
-3.  **Start the application:**
-    ```bash
-    # For Expo
-    npx expo start
-    
-    # For Bare React Native
-    npx react-native run-android 
-    npx react-native run-ios
-    ```
-
-## Usage
-
-* **C:** Clears the entire input and result.
-* **⌫:** Deletes the last character.
-* **√:** Calculates the square root of the following number or expression.
-* **History Scroll:** Scroll through previous calculations at the top and tap one to use it again.
-
-## Technical Implementation
-
-The evaluation logic utilizes a sanitized string replacement method combined with the `Function` constructor:
-- Percentage (`%`) is evaluated as `/100`.
-- Square Root (`√`) is evaluated as `Math.sqrt()`.
-- Results are limited to 8 decimal places using `toFixed(8)` to prevent floating-point errors.
+* **Implicit Multiplication:** Regex-based pre-processor handles expressions like `2π` or `(x)(y)` by injecting multiplication operators.
+* **Trigonometric Normalization:** Automatic conversion of degree inputs to radians for standard trigonometric functions.
+* **Advanced Evaluation:** Supports logarithms (`log10`, `ln`), absolute values, square roots, and exponentiation.
+* **Input Sanitization:** Real-time character replacement for visual operators () into machine-readable syntax.
+* **Haptic Integration:** Hardware-level tactile feedback via `expo-haptics` for keypress validation.
 
 ## Project Structure
 
-* `Calculator.js`: Main logic, history management, and button layout.
-* `Display.js`: Responsive component for showing input and results.
-* `Button.js`: Custom touchable component for the keypad.
-* `styles.js`: Stylesheet for the dark-themed UI.
+* `App.js`: Application entry point and orientation provider.
+* `src/screens/`: Layout logic for Portrait and Scientific modes.
+* `src/store/`: Zustand store for input state and calculation history.
+* `src/utils/mathLogic.js`: MathJS configuration and regex processing engine.
+* `src/components/`: Atomic UI components (Buttons, Drawers).
+* `src/constants/`: Centralized theme and layout variables.
+
+## Installation
+
+1. Install dependencies:
+```bash
+npm install
+
+```
+
+
+2. Build Development Client (Required for New Architecture/Skia):
+```bash
+npx eas build --platform android --profile development
+
+```
+
+
+3. Run the development server:
+```bash
+npx expo start
+
+```
+
+
+
+## Build Configuration
+
+* **Babel:** Configured with `react-native-reanimated/plugin` for workletization.
+* **Android:** `newArchEnabled` set to `true` in `app.json`.
+* **Dependencies:** Uses `legacy-peer-deps` for React 19 compatibility across the ecosystem.
+
+---
