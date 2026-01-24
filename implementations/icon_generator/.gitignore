@@ -1,0 +1,16 @@
+
+node_modules/
+package-lock.json
+
+input/*
+output/*
+
+!input/.gitkeep
+!output/.gitkeep
+
+.DS_Store
+Thumbs.db
+
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

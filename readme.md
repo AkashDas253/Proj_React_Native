@@ -3,6 +3,9 @@
 ## Basics
 - [Hello World](./basics/hello_world/readme.md)
 
+## Implementations
+- [Icon Generator](./implementations/icon_generator/readme.md)
+
 ## Projects
 - [Calculator](./projects/Calculator/readme.md)
 - [Task Taker](./projects/TaskTaker/readme.md)
