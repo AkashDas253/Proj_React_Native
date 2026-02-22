@@ -1,14 +1,16 @@
 # Practice React Native
 
 ## Basics
-- [Hello World](./basics/hello_world/readme.md)
+- [Hello World](./basics/hello_world/)
+- [Initialization with Expo](./basics/initialization_expo/)
 
 ## Implementations
-- [Icon Generator](./implementations/icon_generator/readme.md)
+- [Icon Generator](./implementations/icon_generator/)
 
 ## Projects
-- [Calculator](./projects/Calculator/readme.md)
-- [Task Taker](./projects/TaskTaker/readme.md)
+- [Calculator](./projects/Calculator/)
+- [Task Taker](./projects/TaskTaker/)
+- [Themed Quote App](./projects/themed_quote_app/)
 <!-- ##
 
 
